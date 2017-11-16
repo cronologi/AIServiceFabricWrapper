@@ -1,6 +1,7 @@
 ﻿using LoggingLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace LoggingLibrary
     public sealed class TelemetryLogger : ITelemetryLogger
     {
         private List<ILogAppender> _appenders;
+        private ServiceContext _serviceContext;
 
         public TelemetryLogger(IEnumerable<ILogAppender> appenders)
         {

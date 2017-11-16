@@ -26,11 +26,6 @@ namespace WebStateless
         public WebStateless(StatelessServiceContext context)
             : base(context)
         {
-            //logger = new TelemetryLogger(new List<ILogAppender>()
-            //    {
-            //        new AppInsightsLogAppender(new AppInsightsAppenderConfig()),
-            //        new EventSourceLogAppender(new EventSourceAppenderConfig())
-            //    });
         }
 
         /// <summary>
@@ -39,25 +34,25 @@ namespace WebStateless
         /// <returns>The collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            FabricTelemetryInitializerExtension.SetServiceCallContext(this.Context);
+            //FabricTelemetryInitializerExtension.SetServiceCallContext(this.Context);
 
             return new ServiceInstanceListener[]
             {
                 new ServiceInstanceListener(serviceContext =>
                     new KestrelCommunicationListener(serviceContext, "ServiceEndpoint", (url, listener) =>
                     {
-                        //ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
 
                         return new WebHostBuilder()
                                     .UseKestrel()
                                     .ConfigureServices(
                                         services => services
                                             .AddSingleton<StatelessServiceContext>(serviceContext)
-                                            .AddSingleton<IAppenderConfig, AppInsightsAppenderConfig>()
-                                            .AddSingleton<IAppenderConfig, EventSourceAppenderConfig>()
-                                            .AddSingleton<ILogAppender, AppInsightsLogAppender>()
-                                            .AddSingleton<ILogAppender, EventSourceLogAppender>()
-                                            .AddSingleton<ITelemetryLogger, TelemetryLogger>()
+                                            .AddSingleton<ServiceContext>(serviceContext)
+                                            .AddSingleton<IAppenderConfig>(new AppInsightsAppenderConfig())
+                                            .AddSingleton<IAppenderConfig>(new EventSourceAppenderConfig())
+                                            .AddSingleton<ILogAppender>(x => new AppInsightsLogAppender(x.GetRequiredService<AppInsightsAppenderConfig>(), serviceContext))
+                                            .AddSingleton<ILogAppender>(x => new EventSourceLogAppender(x.GetRequiredService<EventSourceAppenderConfig>()))
+                                            .AddSingleton<ITelemetryLogger>(x => new TelemetryLogger(x.GetServices<ILogAppender>()))
                                             )
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()

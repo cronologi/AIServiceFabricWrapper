@@ -1,27 +1,47 @@
-﻿using Microsoft.Owin;
+﻿using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Fabric;
+using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
-using AppFunc = System.Func<
-    System.Collections.Generic.IDictionary<string, object>,
-    System.Threading.Tasks.Task>;
 
 namespace LoggingLibrary.TraceCorrelation
 {
     public class RequestTrackingMiddleware
     {
-        AppFunc _next;
-        RequestTrackingMiddlewareOptions _options;
+        private readonly RequestDelegate next;
 
-        public async Task Invoke(IDictionary<string, object> environment)
+        public RequestTrackingMiddleware(RequestDelegate next)
         {
-            var ctx = new OwinContext(environment);
+            //this.next = next;
+        }
 
-            _options.OnIncomingRequest(ctx);
-            await _next(environment);
-            _options.OnOutgoingRequest(ctx);
+        public async Task Invoke(HttpContext context, ServiceContext serviceContext)
+        {
+            //CallContext.LogicalSetData(HeaderIdentifiers.TraceId, context.Request.HttpContext.TraceIdentifier);
+
+            //AddTracingDetailsOnRequest(context, serviceContext);
+
+            //try
+            //{
+            //    await next(context);
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw;
+            //}
+            //finally
+            //{
+            //}
+
+        }
+
+        private static void AddTracingDetailsOnRequest(HttpContext context, ServiceContext serviceContext)
+        {
+            //if (!context.Request.Headers.ContainsKey("X-Fabric-AddTracingDetails")) return;
+
+            //context.Response.Headers.Add("X-Fabric-NodeName", serviceContext.NodeContext.NodeName);
+            //context.Response.Headers.Add("X-Fabric-InstanceId", serviceContext.ReplicaOrInstanceId.ToString(CultureInfo.InvariantCulture));
+            //context.Response.Headers.Add("X-Fabric-TraceId", context.Request.HttpContext.TraceIdentifier);
         }
     }
 }

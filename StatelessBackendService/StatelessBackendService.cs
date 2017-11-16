@@ -26,10 +26,10 @@ namespace StatelessBackendService
         {
             logger = new TelemetryLogger(new List<ILogAppender>()
                 {
-                    new AppInsightsLogAppender(new AppInsightsAppenderConfig()),
+                    new AppInsightsLogAppender(new AppInsightsAppenderConfig(), context),
                     new EventSourceLogAppender(new EventSourceAppenderConfig())
                 });
-            FabricTelemetryInitializerExtension.SetServiceCallContext(this.Context);
+            //FabricTelemetryInitializerExtension.SetServiceCallContext(this.Context);
 
         }
 

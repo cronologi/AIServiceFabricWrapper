@@ -8,6 +8,7 @@ using RemotingInterfaces;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using LoggingLibrary.TraceCorrelation;
 using Microsoft.ServiceFabric.Services.Remoting.V1.FabricTransport.Client;
+using LoggingLibrary.Interfaces;
 
 namespace WebStateless.Controllers
 {
@@ -15,10 +16,12 @@ namespace WebStateless.Controllers
     public class ValuesController : Controller
     {
         ServiceContext serviceContext;
+        ITelemetryLogger logger;
 
-        public ValuesController(StatelessServiceContext serviceContext)
+        public ValuesController(StatelessServiceContext serviceContext, ITelemetryLogger logger)
         {
             this.serviceContext = serviceContext;
+            this.logger = logger;
         }
 
         // GET api/values

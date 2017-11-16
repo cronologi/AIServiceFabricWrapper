@@ -4,6 +4,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +15,14 @@ namespace LoggingLibrary.Appenders
     {
         TelemetryClient _telemetryClient; 
         private AppInsightsAppenderConfig _config;
+        private ServiceContext _serviceContext;
 
-        public AppInsightsLogAppender(AppInsightsAppenderConfig config)
+        public AppInsightsLogAppender(AppInsightsAppenderConfig config, ServiceContext serviceContext)
         {
             _config = config;
-            _telemetryClient = new TelemetryClient(TelemetryConfiguration.Active);
+            var telemetryConfig = TelemetryConfiguration.Active;
+            FabricTelemetryInitializerExtension.SetServiceCallContext(serviceContext);
+            this._telemetryClient = new TelemetryClient(telemetryConfig);
         }
 
         public void LogDebug(string message)
