@@ -21,11 +21,12 @@ namespace WebStateless
     /// </summary>
     internal sealed class WebStateless : StatelessService
     {
-        //ITelemetryLogger logger;
+        StatelessServiceContext context;
 
         public WebStateless(StatelessServiceContext context)
             : base(context)
         {
+            this.context = context;
         }
 
         /// <summary>
@@ -34,6 +35,7 @@ namespace WebStateless
         /// <returns>The collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
+            ITelemetryLogger logger = new TelemetryLogger(new List<ILogAppender>() { new AppInsightsLogAppender(new AppInsightsAppenderConfig(), this.context) });
             //FabricTelemetryInitializerExtension.SetServiceCallContext(this.Context);
 
             return new ServiceInstanceListener[]
@@ -46,14 +48,7 @@ namespace WebStateless
                                     .UseKestrel()
                                     .ConfigureServices(
                                         services => services
-                                            .AddSingleton<StatelessServiceContext>(serviceContext)
-                                            .AddSingleton<ServiceContext>(serviceContext)
-                                            .AddSingleton<IAppenderConfig>(new AppInsightsAppenderConfig())
-                                            .AddSingleton<IAppenderConfig>(new EventSourceAppenderConfig())
-                                            .AddSingleton<ILogAppender>(x => new AppInsightsLogAppender(x.GetRequiredService<AppInsightsAppenderConfig>(), serviceContext))
-                                            .AddSingleton<ILogAppender>(x => new EventSourceLogAppender(x.GetRequiredService<EventSourceAppenderConfig>()))
-                                            .AddSingleton<ITelemetryLogger>(x => new TelemetryLogger(x.GetServices<ILogAppender>()))
-                                            )
+                                            .AddSingleton<StatelessServiceContext>(serviceContext))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)

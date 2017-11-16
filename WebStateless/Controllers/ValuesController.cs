@@ -18,10 +18,9 @@ namespace WebStateless.Controllers
         ServiceContext serviceContext;
         ITelemetryLogger logger;
 
-        public ValuesController(StatelessServiceContext serviceContext, ITelemetryLogger logger)
+        public ValuesController(StatelessServiceContext serviceContext)
         {
             this.serviceContext = serviceContext;
-            this.logger = logger;
         }
 
         // GET api/values

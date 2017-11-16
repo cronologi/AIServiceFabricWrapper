@@ -21,16 +21,11 @@ namespace StatelessBackendService
     internal sealed class StatelessBackendService : StatelessService, IMyService
     {
         ITelemetryLogger logger;
+        StatelessServiceContext context;
         public StatelessBackendService(StatelessServiceContext context)
             : base(context)
         {
-            logger = new TelemetryLogger(new List<ILogAppender>()
-                {
-                    new AppInsightsLogAppender(new AppInsightsAppenderConfig(), context),
-                    new EventSourceLogAppender(new EventSourceAppenderConfig())
-                });
-            //FabricTelemetryInitializerExtension.SetServiceCallContext(this.Context);
-
+            this.context = context;
         }
 
         public Task<string> HelloWorldAsync()
@@ -46,6 +41,11 @@ namespace StatelessBackendService
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
+            logger = new TelemetryLogger(new List<ILogAppender>()
+                {
+                    new AppInsightsLogAppender(new AppInsightsAppenderConfig(), context),
+                    new EventSourceLogAppender(new EventSourceAppenderConfig())
+                });
 
             return new ServiceInstanceListener[1]
             {
